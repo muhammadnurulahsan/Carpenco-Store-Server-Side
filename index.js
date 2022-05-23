@@ -68,10 +68,10 @@ async function run() {
     const verifyAdmin = async (req, res, next) => {
       const user = req.decoded.email;
       const requester = await usersCollection.findOne({ email: user });
-      if (requester.role === "admin") {
+      if (requester?.role === "admin") {
         next();
       } else {
-        res.status(403).send({ message: "Are Vai Tumi Admin NA To!!" });
+        res.status(403).send({ message: "Are Vai Tumi Admin NaTo!!" });
       }
     };
 
@@ -159,8 +159,8 @@ async function run() {
 
     // GET ALL USER INFO (ONLY ADMIN)
     app.get("/user", verifyToken, verifyAdmin, async (req, res) => {
-      const users = await usersCollection.find({}).toArray();
-      res.send(users);
+        const users = await usersCollection.find({}).toArray();
+        res.send(users);
     });
 
     // GET USER BASED ON EMAIL
@@ -211,14 +211,21 @@ async function run() {
 
     // GET ALL REVIEWS
     app.get("/reviews", async (req, res) => {
-      const result = await reviewsCollection.find({}).toArray();
-      res.send(result);
+      if (req.query.email) {
+        const email = req.query.email;
+        const filter = { email: email };
+        const result = await reviewsCollection.find(filter).toArray();
+        res.send(result);
+      } else {
+        const result = await reviewsCollection.find({}).toArray();
+        res.send(result);
+      }
     });
 
     // POST A NEW REVIEW
     app.post("/reviews", async (req, res) => {
-      const testimonial = req.body;
-      const result = await reviewsCollection.insertOne(testimonial);
+      const review = req.body;
+      const result = await reviewsCollection.insertOne(review);
       res.send(result);
     });
 
@@ -226,7 +233,7 @@ async function run() {
     app.get("/admin/:email", async (req, res) => {
       const email = req.params.email;
       const user = await usersCollection.findOne({ email: email });
-      const isAdmin = user.role === "admin";
+      const isAdmin = user?.role === "admin";
       res.send({ admin: isAdmin });
     });
 
@@ -270,14 +277,8 @@ async function run() {
     // POST A NEW ORDER TO DATABASE
     app.post("/orders", async (req, res) => {
       const order = req.body;
-      const query = { name: order.name, customer: order.customer };
-      const findDuplicate = await ordersCollection.findOne(query);
-      if (findDuplicate) {
-        res.send({ message: "already purchased" });
-      } else {
-        const result = await ordersCollection.insertOne(order);
-        res.send(result);
-      }
+      const result = await ordersCollection.insertOne(order);
+      res.send(result);
     });
 
     // SET PAID STATUS AND TRANSACTION ID TO PAID PRODUCTS
