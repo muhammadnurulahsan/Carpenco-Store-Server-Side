@@ -1,10 +1,11 @@
 const express = require("express");
 const cors = require("cors");
+const app = express();
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
-const app = express();
 const port = process.env.PORT || 8080;
 
 //middleware
@@ -27,7 +28,6 @@ app.use(function (req, res, next) {
   next();
 });
 
-const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.pxjyc.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
@@ -99,7 +99,7 @@ async function run() {
       }
     });
 
-    // CREATE PAYMENT INTENT
+    // // CREATE PAYMENT INTENT
     app.post("/create-payment-intent", async (req, res) => {
       const service = req.body;
       const price = service?.totalPrice;
@@ -119,7 +119,7 @@ async function run() {
       res.send(cursor);
     });
 
-    // GET NEWS
+    // // GET NEWS
     app.get("/news", async (req, res) => {
       const cursor = await newsCollection.find({}).toArray();
       res.send(cursor);
@@ -131,7 +131,7 @@ async function run() {
       res.send(users);
     });
 
-    // GET USER BASED ON EMAIL
+    // // GET USER BASED ON EMAIL
     app.get("/user/:email", verifyToken, async (req, res) => {
       const email = req.params.email;
       const query = { email: email };
@@ -147,7 +147,7 @@ async function run() {
       res.send(cursor);
     });
 
-    // CHECK A USER IS ADMIN OR NOT
+    // // CHECK A USER IS ADMIN OR NOT
     app.get("/admin/:email", async (req, res) => {
       const email = req.params.email;
       const user = await usersCollection.findOne({ email: email });
@@ -161,7 +161,7 @@ async function run() {
       res.send(result);
     });
 
-    // GET ALL ORDERS
+    // // GET ALL ORDERS
     app.get("/orders", verifyToken, async (req, res) => {
       if (req.query.email) {
         const email = req.query.email;
@@ -174,7 +174,7 @@ async function run() {
       }
     });
 
-    // GET ORDERS BASED ON ID
+    // // GET ORDERS BASED ON ID
     app.get("/orders/:id", verifyToken, async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
@@ -182,7 +182,7 @@ async function run() {
       res.send(result);
     });
 
-    // POST A NEW ORDER TO DATABASE
+    // // POST A NEW ORDER TO DATABASE
     app.post("/orders", async (req, res) => {
       const order = req.body;
       const query = { name: order.name, customer: order.customer };
@@ -195,7 +195,7 @@ async function run() {
       }
     });
 
-    // POST A NEW REVIEW
+    // // POST A NEW REVIEW
     app.post("/reviews", async (req, res) => {
       const testimonial = req.body;
       const result = await reviewsCollection.insertOne(testimonial);
@@ -241,7 +241,7 @@ async function run() {
       res.send(updatedStatus);
     });
 
-    // CREATE NEW ADMIN
+    // // CREATE NEW ADMIN
     app.put(
       "/user/admin/:email",
       verifyToken,
