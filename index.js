@@ -75,7 +75,18 @@ async function run() {
       }
     };
 
-    
+    // CREATE PAYMENT
+    app.post("/create-payment", async (req, res) => {
+      const service = req.body;
+      const price = service?.totalPrice;
+      const amount = price * 100;
+      const payment = await stripe.payment.create({
+        amount: amount,
+        currency: "usd",
+        payment_method_types: ["card"],
+      });
+      res.send({ clientSecret: payment.client_secret });
+    });
 
     // GET ALL PRODUCTS AND BASED ON QUERY
     app.get("/products", verifyToken, async (req, res) => {
