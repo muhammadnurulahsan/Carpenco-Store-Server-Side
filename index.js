@@ -153,6 +153,27 @@ async function run() {
       res.send(result);
     });
 
+    // PUT AUTHORIZED USER
+    app.put("/user/:email", async (req, res) => {
+      const email = req.params.email;
+      const user = req.body;
+      const filter = { email: email };
+      const options = { upsert: true };
+      const updateUser = {
+        $set: user,
+      };
+      const result = await usersCollection.updateOne(
+        filter,
+        updateUser,
+        options
+      );
+      const accessToken = jwt.sign(
+        { email: email },
+        process.env.ACCESS_TOKEN_SECRET
+      );
+      res.send({ result, token: accessToken });
+    });
+
     // GET ALL USER INFO (ONLY ADMIN)
     app.get("/user", verifyToken, verifyAdmin, async (req, res) => {
       const users = await usersCollection.find({}).toArray();
@@ -173,27 +194,6 @@ async function run() {
       const query = { email: email };
       const result = await usersCollection.deleteOne(query);
       res.send(result);
-    });
-
-    // PUT AUTHORIZED USER
-    app.put("/user/:email", async (req, res) => {
-      const email = req.params.email;
-      const user = req.body;
-      const filter = { email: email };
-      const options = { upsert: true };
-      const updateUser = {
-        $set: user,
-      };
-      const result = await usersCollection.updateOne(
-        filter,
-        updateUser,
-        options
-      );
-      const accessToken = jwt.sign(
-        { email: email },
-        process.env.ACCESS_TOKEN_SECRET
-      );
-      res.send({ result, token: accessToken });
     });
 
     // UPDATE USER PROFILE
