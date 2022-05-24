@@ -196,6 +196,22 @@ async function run() {
       res.send(result);
     });
 
+    // CREATE NEW ADMIN
+    app.put(
+      "/user/admin/:email",
+      verifyToken,
+      verifyAdmin,
+      async (req, res) => {
+        const email = req.params.email;
+        const filter = { email: email };
+        const updateAdmin = {
+          $set: { role: "admin" },
+        };
+        const result = await usersCollection.updateOne(filter, updateAdmin);
+        res.send(result);
+      }
+    );
+
     // UPDATE USER PROFILE
     app.put("/user/update/:email", async (req, res) => {
       const email = req.params.email;
@@ -212,22 +228,6 @@ async function run() {
       );
       res.send(result);
     });
-
-    // CREATE NEW ADMIN
-    app.put(
-      "/user/admin/:email",
-      verifyToken,
-      verifyAdmin,
-      async (req, res) => {
-        const email = req.params.email;
-        const filter = { email: email };
-        const updateAdmin = {
-          $set: { role: "admin" },
-        };
-        const result = await usersCollection.updateOne(filter, updateAdmin);
-        res.send(result);
-      }
-    );
 
     // GET ALL REVIEWS
     app.get("/reviews", async (req, res) => {
