@@ -4,7 +4,7 @@ const app = express();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
-// const stripe = require("stripe")(process.env.STRIPE_SECRET);
+const stripe = require("stripe")(process.env.STRIPE_SECRET);
 const port = process.env.PORT || 5000;
 
 //middleware
@@ -80,12 +80,12 @@ async function run() {
       const service = req.body;
       const price = service?.totalPrice;
       const amount = price * 100;
-      const payment = await stripe.payment.create({
+      const paymentIntent = await stripe.paymentIntents.create({
         amount: amount,
         currency: "usd",
         payment_method_types: ["card"],
       });
-      res.send({ clientSecret: payment.client_secret });
+      res.send({ clientSecret: paymentIntent.client_secret });
     });
 
     // GET ALL PRODUCTS AND BASED ON QUERY
@@ -150,17 +150,13 @@ async function run() {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await productsCollection.deleteOne(query);
-      if (result.deletedCount === 1) {
-        res.status(200).send({ message: "Successfully Deleted One document" });
-      } else {
-        res.status(404).send({ message: "Something Went Wrong" });
-      }
+      res.send(result);
     });
 
     // GET ALL USER INFO (ONLY ADMIN)
     app.get("/user", verifyToken, verifyAdmin, async (req, res) => {
-        const users = await usersCollection.find({}).toArray();
-        res.send(users);
+      const users = await usersCollection.find({}).toArray();
+      res.send(users);
     });
 
     // GET USER BASED ON EMAIL
@@ -169,6 +165,14 @@ async function run() {
       const query = { email: email };
       const users = await usersCollection.findOne(query);
       res.send(users);
+    });
+
+    // DELETE A USER BASED ON EMAIL
+    app.delete("/user/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const result = await usersCollection.deleteOne(query);
+      res.send(result);
     });
 
     // PUT AUTHORIZED USER
@@ -288,7 +292,7 @@ async function run() {
       const filter = { _id: ObjectId(id) };
       const doc = {
         $set: {
-          status: "pending",
+          status: "Pending",
           transactionId: payment.transactionId,
         },
       };
@@ -298,13 +302,14 @@ async function run() {
     });
 
     // GET ALL PAYMENTS BASED ON STATUS ID
-    app.put("/orders/status/:id", verifyToken, async (req, res) => {
+    app.put("/status/:id", verifyToken, async (req, res) => {
       const id = req.params.id;
       const payment = req.body;
       const filter = { _id: ObjectId(id) };
       const updatedDoc = {
         $set: {
-          status: payment.status,
+          orderStatus: payment.orderStatus,
+          paymentStatus: payment.paymentStatus,
         },
       };
       const updatedStatus = await ordersCollection.updateOne(
@@ -319,11 +324,7 @@ async function run() {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await ordersCollection.deleteOne(query);
-      if (result.deletedCount === 1) {
-        res.status(200).send({ message: "Successfully Deleted One document" });
-      } else {
-        res.status(404).send({ message: "Something Went Wrong" });
-      }
+      res.send(result);
     });
   } finally {
     // client.close();

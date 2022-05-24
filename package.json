@@ -17,6 +17,7 @@
     "express": "^4.18.0",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^4.5.0",
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.15",
+    "stripe": "^9.5.0"
   }
 }
