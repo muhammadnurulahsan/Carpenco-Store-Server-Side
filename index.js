@@ -270,6 +270,24 @@ async function run() {
       res.send({ admin: isAdmin });
     });
 
+    // GET ALL PAYMENTS BASED ON STATUS ID
+    app.put("/status/:id", verifyToken, async (req, res) => {
+      const id = req.params.id;
+      const payment = req.body;
+      const filter = { _id: ObjectId(id) };
+      const updatedDoc = {
+        $set: {
+          orderStatus: payment.orderStatus,
+          paymentStatus: payment.paymentStatus,
+        },
+      };
+      const updatedStatus = await ordersCollection.updateOne(
+        filter,
+        updatedDoc
+      );
+      res.send(updatedStatus);
+    });
+
     // GET ORDERS BASED ON ID
     app.get("/orders/:id", verifyToken, async (req, res) => {
       const id = req.params.id;
@@ -299,24 +317,6 @@ async function run() {
       const result = await paymentsCollection.insertOne(payment);
       const updatedOrder = await ordersCollection.updateOne(filter, doc);
       res.send(updatedOrder);
-    });
-
-    // GET ALL PAYMENTS BASED ON STATUS ID
-    app.put("/status/:id", verifyToken, async (req, res) => {
-      const id = req.params.id;
-      const payment = req.body;
-      const filter = { _id: ObjectId(id) };
-      const updatedDoc = {
-        $set: {
-          orderStatus: payment.orderStatus,
-          paymentStatus: payment.paymentStatus,
-        },
-      };
-      const updatedStatus = await ordersCollection.updateOne(
-        filter,
-        updatedDoc
-      );
-      res.send(updatedStatus);
     });
 
     // DELETE A PRODUCT BASED ON ID FROM ORDER LIST
