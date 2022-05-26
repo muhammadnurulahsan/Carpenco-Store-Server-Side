@@ -212,43 +212,6 @@ async function run() {
       }
     );
 
-    // UPDATE USER PROFILE
-    app.put("/user/update/:email", async (req, res) => {
-      const email = req.params.email;
-      const userInfo = req.body;
-      const filter = { email: email };
-      const options = { upsert: true };
-      const updateUser = {
-        $set: userInfo,
-      };
-      const result = await usersCollection.updateOne(
-        filter,
-        updateUser,
-        options
-      );
-      res.send(result);
-    });
-
-    // GET ALL REVIEWS
-    app.get("/reviews", async (req, res) => {
-      if (req.query.email) {
-        const email = req.query.email;
-        const filter = { email: email };
-        const result = await reviewsCollection.find(filter).toArray();
-        res.send(result);
-      } else {
-        const result = await reviewsCollection.find({}).toArray();
-        res.send(result);
-      }
-    });
-
-    // POST A NEW REVIEW
-    app.post("/reviews", async (req, res) => {
-      const review = req.body;
-      const result = await reviewsCollection.insertOne(review);
-      res.send(result);
-    });
-
     // GET ALL ORDERS
     app.get("/orders", verifyToken, async (req, res) => {
       if (req.query.email) {
@@ -286,6 +249,43 @@ async function run() {
         updatedDoc
       );
       res.send(updatedStatus);
+    });
+
+    // UPDATE USER PROFILE
+    app.put("/user/update/:email", async (req, res) => {
+      const email = req.params.email;
+      const userInfo = req.body;
+      const filter = { email: email };
+      const options = { upsert: true };
+      const updateUser = {
+        $set: userInfo,
+      };
+      const result = await usersCollection.updateOne(
+        filter,
+        updateUser,
+        options
+      );
+      res.send(result);
+    });
+
+    // GET ALL REVIEWS
+    app.get("/reviews", async (req, res) => {
+      if (req.query.email) {
+        const email = req.query.email;
+        const filter = { email: email };
+        const result = await reviewsCollection.find(filter).toArray();
+        res.send(result);
+      } else {
+        const result = await reviewsCollection.find({}).toArray();
+        res.send(result);
+      }
+    });
+
+    // POST A NEW REVIEW
+    app.post("/reviews", async (req, res) => {
+      const review = req.body;
+      const result = await reviewsCollection.insertOne(review);
+      res.send(result);
     });
 
     // GET ORDERS BASED ON ID
@@ -326,7 +326,6 @@ async function run() {
       const updatedOrder = await ordersCollection.updateOne(filter, doc);
       res.send(updatedOrder);
     });
-    
   } finally {
     // client.close();
   }
