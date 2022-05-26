@@ -233,6 +233,8 @@ async function run() {
       res.send({ admin: isAdmin });
     });
 
+    
+
     // GET ALL PAYMENTS BASED ON STATUS ID
     app.put("/status/:id", verifyToken, async (req, res) => {
       const id = req.params.id;
