@@ -303,6 +303,14 @@ async function run() {
       res.send(result);
     });
 
+    // DELETE A PRODUCT BASED ON ID FROM ORDER LIST
+    app.delete("/order/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await ordersCollection.deleteOne(query);
+      res.send(result);
+    });
+
     // SET PAID STATUS AND TRANSACTION ID TO PAID PRODUCTS
     app.put("/orders/:id", verifyToken, async (req, res) => {
       const id = req.params.id;
@@ -318,14 +326,7 @@ async function run() {
       const updatedOrder = await ordersCollection.updateOne(filter, doc);
       res.send(updatedOrder);
     });
-
-    // DELETE A PRODUCT BASED ON ID FROM ORDER LIST
-    app.delete("/order/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: ObjectId(id) };
-      const result = await ordersCollection.deleteOne(query);
-      res.send(result);
-    });
+    
   } finally {
     // client.close();
   }
