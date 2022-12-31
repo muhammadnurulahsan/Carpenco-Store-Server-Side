@@ -8,7 +8,7 @@
 
 **Carpenco are skilled artisans who construct, erect, install and renovate structures made of wood and other materials, ranging from kitchen cabinets to building frameworks. They work in various areas of construction.**
 
-**Admin Credentials:-** 
+**Admin Credentials:-**
 **Email:- admin@gmail.com**
 **Password:- 654321**
 
@@ -16,7 +16,7 @@
 
 • Firebase Live:- [Link](https://carpenco-store.web.app)
 
-• Heroku Database:- [Link](https://carpenco-store.herokuapp.com)
+• Heroku Database:- [Link](https://carpenco-store-server-side.vercel.app)
 
 What technology or assets I have used for building this website.
 
